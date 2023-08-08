@@ -29,10 +29,10 @@ int main(int argc, char **argv){
   // ArgMapping amap;
   //            security Level/2，L, c, p,  d=16/24,  s=预计的槽数， chosen_m=0，false)
   // long FindM(long k, long L, long c, long p, long d, long s, long chosen_m, bool verbose)
-  long idx = 2;
+  long idx = 6;
   // amap.arg("sz", idx, "parameter-sets: toy=0 through huge=5");
 
-  long c=3;
+  long c=9;
   // amap.arg("c", c, "number of columns in the key-switching matrices");
 
   long L=25;
@@ -48,7 +48,7 @@ int main(int argc, char **argv){
   // amap.arg("packed", packed, "use packed bootstrapping");
 
   // amap.parse(argc, argv);
-  if (idx>5) idx = 5;
+  if (idx>6) idx = 6;
   // {65536, 65537, 32,  1273}, // gens=2(32),3(!2048)
 
   long p = mValues[idx][0];
@@ -85,7 +85,7 @@ int main(int argc, char **argv){
                   .m(m)
                   .p(p)
                   .r(1)
-                  .c(14)
+                  .c(c)
                   .bits(bits)
                   .build());
 

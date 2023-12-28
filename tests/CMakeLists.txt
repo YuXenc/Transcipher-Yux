@@ -34,3 +34,9 @@ target_link_libraries(test-trans-Yu2x-8-C4  PUBLIC Transcipher Symmetric helib)
 target_link_libraries(test-trans-Yu2x-8-C1  PUBLIC Transcipher Symmetric helib)
 
 target_link_libraries(test-expand16         PUBLIC Transcipher Symmetric helib)
+
+add_executable(test-findM    findM.cpp)
+
+target_link_libraries(test-findM         PUBLIC Transcipher helib)
+
+

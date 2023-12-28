@@ -22,33 +22,33 @@ using namespace NTL;
 
 static long mValues[][3] = { 
 //{   p,       m,   bits}
-  { 65537,  16384,  119}, // m=(3)*{257}
+  { 65537,  16384,  300}, // m=(3)*{257}
   { 65537,  131072,  750}, // m=(3)*{257}
-  { 65537,  65537,  600}, // m=(3)*{257}
+  { 65537,  32768,  600}, // m=(3)*{257}
   { 65537,  8191,  600}, // m=(3)*{257}
-
-
-  // { 65537,   4369,  360}, // m=17*(257)
-  // { 65537,}, // m=5*17*(257)
-  // { 65537,}, // m=7*17*(241) bits: 600
-  // { 65537, }, // m=13*17*(241) bits: 630 
-  // { 65537,}  // m=97*(673)
+  { 65537,  65536,  750}, // m=(3)*{257}
 };
 
 bool dec_test() {
   chrono::high_resolution_clock::time_point time_start, time_end;
   chrono::milliseconds time_diff;
+    int idx = 4;
+    if (idx >5) {
+      idx = 0;
+    }
 
     int i, Nr=pROUND; // Nr is round number
     int Nk= 16; // a block has Nk Words
     long plain_mod = 65537;
     long roundKeySize = (Nr+1)*Nk;
-    int nBlocks = 1;
+    int nBlocks = 2;
     uint64_t in[Nk],  Key[Nk];
    
     uint64_t plain[16] = {0x09990, 0x049e1, 0x0dac4, 0x053b5, 0x0ff86, 0x06f91, 0x07a8f, 0x0e700,
         0x0152e, 0x034b6, 0x0a16f, 0x01219, 0x00b83, 0x09ab7, 0x06b12, 0x0e2b1};
-    uint64_t plain1[16] = {0x09999, 0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999,0x09999};
+    uint64_t plain1[32] = {7, 14794, 19266, 12709, 17341, 20442, 7, 7, 27241, 22276, 9410, 7, 1822, 7, 13834, 4821,
+     0x09990, 0x049e1, 0x0dac4, 0x053b5, 0x0ff86, 0x06f91, 0x07a8f, 0x0e700,
+        0x0152e, 0x034b6, 0x0a16f, 0x01219, 0x00b83, 0x09ab7, 0x06b12, 0x0e2b1};
     uint64_t temp3[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     Vec<uint64_t> ptxt(INIT_SIZE, nBlocks*Nk); //8*10
@@ -58,6 +58,11 @@ bool dec_test() {
     for(i=0;i<Nk;i++)
       {
         Key[i]=temp3[i];
+        // ptxt[i]=plain1[i];
+      }
+    for(i=0;i<Nk*nBlocks;i++)
+      {
+        // Key[i]=temp3[i];
         ptxt[i]=plain1[i];
       }
 
@@ -75,15 +80,12 @@ bool dec_test() {
     //   for (int d=0; d< Nk; d++)
     //   {
     //     cout<<d;
-    //     printf(". %05llx  ;",keySchedule[r*Nk+d]);
+    //     printf(". %05llx; ",keySchedule[r*Nk+d]);
     //   }
     //   cout<< "\n";
     // }
     // printf("\nroundKeySchedule---END!\n");
-    int idx = 1;
-    if (idx >5) {
-      idx = 0;
-    }
+
 
     // 1. Symmetric encryption: symCtxt = Enc(symKey, ptxt) 
     for (long i=0; i<nBlocks; i++) {
@@ -104,21 +106,21 @@ bool dec_test() {
     uint64_t RoundKey_invert[roundKeySize];
     cipher.decRoundKey(RoundKey_invert, keySchedule);
 
-    printf("RoundKey_invert---:\n");
-    for(int r=0;r<Nr+1; r++)
-    {
-      cout<<"round" << r <<" : ";
-      for (int d=0; d< Nk; d++)
-      {
-        cout<<d;
-        printf(". %05llx ",RoundKey_invert[r*Nk+d]);
-      }
-      cout<< "\n";
-    }
-    printf("\nRoundKey_invert---END!\n");
+    // printf("RoundKey_invert---:\n");
+    // for(int r=0;r<Nr+1; r++)
+    // {
+    //   cout<<"round" << r <<" : ";
+    //   for (int d=0; d< Nk; d++)
+    //   {
+    //     cout<<d;
+    //     printf(". %05llx ",RoundKey_invert[r*Nk+d]);
+    //   }
+    //   cout<< "\n";
+    // }
+    // printf("\nRoundKey_invert---END!\n");
 
     auto context = Transcipher16_F_p::create_context(mValues[idx][1], mValues[idx][0], /*r=*/1, mValues[idx][2], 
-                                                      /*c=*/2, /*d=*/1, /*k=*/128, /*s=*/1);
+                                                      /*c=*/9, /*d=*/1, /*k=*/128, /*s=*/1);
     Transcipher16_F_p FHE_cipher(context);
     FHE_cipher.print_parameters();
     // cipher.activate_bsgs(use_bsgs);
@@ -155,16 +157,21 @@ bool dec_test() {
     time_start = chrono::high_resolution_clock::now();
 
     // homomorphic decryption
-    Vec<uint64_t> poly(INIT_SIZE, homEncrypted.size());
+    Vec<ZZX> poly(INIT_SIZE, homEncrypted.size());
+    // vector<long> HHEResult(nBlocks*Nk, 0);
     cout<<endl;
     for (long i=0; i<poly.length(); i++)
     {
       FHE_cipher.decrypt(homEncrypted[i], poly[i]);
-      cout<<i;
-      printf(". %05llx ",poly[i]);
+      // cout<<i;
+      // printf(". %05llx ",poly[i]);
     }
-    cout<<endl;
+    // cout<<endl;
 
+    Vec<uint64_t> HHEResult(INIT_SIZE, nBlocks*Nk);
+
+    FHE_cipher.decodeTo16Ctxt(HHEResult, poly);
+    printState_p(HHEResult);  cout << endl;
 
     Vec<uint64_t> symDeced(INIT_SIZE, nBlocks*Nk);
     for (long i=0; i<nBlocks; i++) {
@@ -178,16 +185,16 @@ bool dec_test() {
         printf(". %05llx ",symDeced[i]);
       }
     printf("\n\n");
-    printState_p(symDeced);  cout << endl;
+
       
-    if (ptxt != symDeced) {
+    if (ptxt != HHEResult) {
       cout << "@ decryption error\n";
-      if (ptxt.length()!=symDeced.length())
+      if (ptxt.length()!=HHEResult.length())
         cout << "  size mismatch, should be "<<ptxt.length()
-      << " but is "<<symDeced.length()<<endl;
+      << " but is "<<HHEResult.length()<<endl;
       else {
         cout << "  input symCtxt = "; printState_p(symEnced); cout << endl;
-        cout << "  output    got = "; printState_p(symDeced); cout << endl;
+        cout << "  output  HHEResult = "; printState_p(HHEResult); cout << endl;
         cout << " should be ptxt = "; printState_p(ptxt); cout << endl;
       }
     }

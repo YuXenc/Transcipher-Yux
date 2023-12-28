@@ -29,7 +29,7 @@ int main(int argc, char **argv){
   // ArgMapping amap;
   //            security Level/2，L, c, p,  d=16/24,  s=预计的槽数， chosen_m=0，false)
   // long FindM(long k, long L, long c, long p, long d, long s, long chosen_m, bool verbose)
-  long idx = 7;
+  long idx = 6;
   // amap.arg("sz", idx, "parameter-sets: toy=0 through huge=5");
 
   long c=6;
@@ -48,12 +48,13 @@ int main(int argc, char **argv){
   // amap.arg("packed", packed, "use packed bootstrapping");
 
   // amap.parse(argc, argv);
-  if (idx>10) idx = 7;
+  if (idx>8) idx = 6;
   // {65536, 65537, 32,  1273}, // gens=2(32),3(!2048)
 
   long p = mValues[idx][0];
   //  long phim = mValues[idx][1];
   long m = mValues[idx][2];
+  // long m = 65535;
 
   long bits = mValues[idx][4];
 

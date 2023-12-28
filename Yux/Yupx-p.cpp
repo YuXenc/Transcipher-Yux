@@ -125,7 +125,7 @@ void Yux_F_p::encSboxFi(uint64_t state[], int begin)
   uint64_t c2=state[begin+2];
   uint64_t c3=state[begin+3];
 
-  uint64_t temp = (modulus -(c0*c1+c2 +roundConstant+(modulus -c3))% modulus) % modulus;
+  uint64_t temp = (modulus -(c0*c1+c2 +roundConstant+(modulus -(c3)%modulus))% modulus) % modulus;
 
   state[begin] = temp;
   state[begin+1] = c0;
@@ -213,7 +213,8 @@ void Yux_F_p::constantForKey(uint64_t RC[56][4])
       for(j=0; j<4; j++)
       {
         tmp[j] = 4*i+j+1;
-        // printf("%02x ",tmp[j]);
+        // printf("%04x ",tmp[j]);
+
       }
       
       //Sf(tmp)
@@ -225,8 +226,10 @@ void Yux_F_p::constantForKey(uint64_t RC[56][4])
       // mcsry RC[i]=tmp;
       // memcpy(&RC[i], &tmp[0], 4);
       for(j=0; j<4; j++) {
+        // printf("%04x ",tmp[j]);
         RC[i][j] = tmp[j];
       }
+      // cout<< endl;
       // RC[i] = &tmp;
     }
 }

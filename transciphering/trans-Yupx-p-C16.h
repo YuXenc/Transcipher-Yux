@@ -82,8 +82,8 @@ public:
   // Encode plaintext/ciphertext bytes as native HE plaintext
   // packing
   void encodeTo16Ctxt(Vec<ZZX>& encData, const Vec<uint64_t>& data, long s);
-
-  void decrypt(helib::Ctxt& in, uint64_t& out);
+  void decodeTo16Ctxt(Vec<uint64_t>& data, const Vec<ZZX>& encData);
+  void decrypt(helib::Ctxt& in, ZZX& out);
   static void decSboxFunc(vector<Ctxt>& eData, long begin, Ctxt& encA);
 
 

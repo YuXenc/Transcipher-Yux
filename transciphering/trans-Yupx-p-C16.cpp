@@ -230,6 +230,8 @@ void Transcipher16_F_p::encodeTo16Ctxt(Vec<ZZX>& encData, const Vec<uint64_t>& d
   }
 }
 
+
+
 void Transcipher16_F_p::buildRoundConstant(Ctxt& encA)
 {
   // long --> ZZX -->Ctxt 
@@ -258,9 +260,46 @@ void Transcipher16_F_p::decSboxFunc(vector<Ctxt>& eData, long begin, Ctxt& encA)
 }
 
 
-void Transcipher16_F_p::decrypt(helib::Ctxt& in, uint64_t& out) {
+void Transcipher16_F_p::decrypt(helib::Ctxt& in, ZZX& out) {
   std::vector<long> p;
-  ea.decrypt(in, he_sk, p);
-  out = p[0];
+  // Vec<ZZX> pp(INIT_SIZE, nslots);
+  // ea.decrypt(in, he_sk, out);
+  // ea.decrypt(in, he_sk, pp);
+  he_sk.Decrypt(out, in);
+  // out = p[0];
 }
 
+// void Transcipher16_F_p::decrypt(helib::Ctxt& in, Vec<ZZX>& out) {
+//   std::vector<long> p;
+//   ea.decrypt(in, he_sk, out);
+//   // out = p[0];
+// }
+
+
+void Transcipher16_F_p::decodeTo16Ctxt(Vec<uint64_t>& data, const Vec<ZZX>& encData)
+{
+  long nAllWords = encData.length() * nslots; // ceil( data.length()/16 ) =(a + b - 1)/b
+  if (data.length()<=0 || data.length()>nAllWords)
+    data.SetLength(nAllWords);
+
+
+  // 一个分组有16个字
+  long nWords = BlockWords;
+  long nAllBlocks = divc(data.length(), nWords); // ceil( data.length()/16 ) =(a + b - 1)/b
+
+  long nCtxt = nWords;
+
+  vector<long> slots(ea.size(), 0);
+  for (long i=0; i<nCtxt; i++) {         // i is the cipehrtext number
+    ea.decode(slots, encData[i]);
+    for (long j=0; j<nAllBlocks; j++) { // j is the block number in this ctxt
+      // long slotIdx = j;
+      long byteIdx = i + nWords*j;
+      // long byteIdx = j*BlockWords+ i; 
+      if (byteIdx < data.length()) {
+          data[byteIdx] = slots[j];
+          // printf(". %05llx ",data[byteIdx]);
+        }
+    }  
+  }
+}

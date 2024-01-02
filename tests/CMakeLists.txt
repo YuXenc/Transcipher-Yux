@@ -8,7 +8,6 @@ add_executable(test-Yu2x-16        test-Yu2x-16.cpp)
 add_executable(test-Yupx-p         test-Yupx-p.cpp)
 
 add_executable(test-trans-Yupx-p-16        test-trans-Yupx-p-C16.cpp)
-add_executable(test-trans-Yupx-p-1         test-trans-Yupx-p-C1.cpp)
 
 add_executable(test-trans-Yu2x-16-C16    test-trans-Yu2x-16-C16.cpp)
 
@@ -25,7 +24,6 @@ target_link_libraries(test-Yu2x-16      PUBLIC  Symmetric helib)
 target_link_libraries(test-Yupx-p                   Symmetric)
 
 target_link_libraries(test-trans-Yupx-p-16  PUBLIC Transcipher Symmetric helib)
-target_link_libraries(test-trans-Yupx-p-1   PUBLIC Transcipher Symmetric helib)
 
 target_link_libraries(test-trans-Yu2x-16-C16 PUBLIC Transcipher Symmetric helib)
 

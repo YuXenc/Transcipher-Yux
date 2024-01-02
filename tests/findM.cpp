@@ -25,7 +25,7 @@ int main(int argc, char **argv){
     long bits = 500;
 
     
-    for(long m = 28679; m < 50000; m++) {
+    for(long m = 30813; m < 50000; m++) {
         setTimersOn();
         try
         {

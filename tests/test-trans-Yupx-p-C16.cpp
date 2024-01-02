@@ -20,21 +20,18 @@ using namespace NTL;
 //#define DEBUG
 // #define homEnc
 
-static long mValues[][3] = { 
+static long mValues[][4] = { 
 //{   p,       m,   bits}
-  { 65537,  16384,  300}, // m=(3)*{257}
-  { 65537,  131072,  750}, // m=(3)*{257}
-  { 65537,  32768,  600}, // m=(3)*{257}
-  { 65537,  8191,  600}, // m=(3)*{257}
-  { 65537,  65536,  750}, // m=(3)*{257}
+  { 65537,  131072,  1320, 6}, // m=(3)*{257} 1250
+  { 65537,  65536,  853, 17}, // m=(3)*{257}
 };
 
 bool dec_test() {
   chrono::high_resolution_clock::time_point time_start, time_end;
   chrono::milliseconds time_diff;
-    int idx = 4;
-    if (idx >5) {
-      idx = 0;
+      int idx = 1;
+    if (idx >1) {
+      idx = 1;
     }
 
     int i, Nr=pROUND; // Nr is round number
@@ -56,15 +53,13 @@ bool dec_test() {
 
     // Copy the Key and PlainText
     for(i=0;i<Nk;i++)
-      {
-        Key[i]=temp3[i];
-        // ptxt[i]=plain1[i];
-      }
+    {
+      Key[i]=temp3[i];
+    }
     for(i=0;i<Nk*nBlocks;i++)
-      {
-        // Key[i]=temp3[i];
-        ptxt[i]=plain1[i];
-      }
+    {
+      ptxt[i]=plain1[i];
+    }
 
     Yux_F_p cipher = Yux_F_p(Nk, Nr, plain_mod);
     
@@ -73,19 +68,6 @@ bool dec_test() {
     // The KeyExpansion routine must be called before encryption.
     uint64_t keySchedule[roundKeySize];
     cipher.KeyExpansion(keySchedule, Key);
-    // printf("roundKeySchedule---:\n");
-    // for(int r=0;r<pROUND+1; r++)
-    // {
-    //   cout<<"round" << r <<" : ";
-    //   for (int d=0; d< Nk; d++)
-    //   {
-    //     cout<<d;
-    //     printf(". %05llx; ",keySchedule[r*Nk+d]);
-    //   }
-    //   cout<< "\n";
-    // }
-    // printf("\nroundKeySchedule---END!\n");
-
 
     // 1. Symmetric encryption: symCtxt = Enc(symKey, ptxt) 
     for (long i=0; i<nBlocks; i++) {
@@ -106,21 +88,8 @@ bool dec_test() {
     uint64_t RoundKey_invert[roundKeySize];
     cipher.decRoundKey(RoundKey_invert, keySchedule);
 
-    // printf("RoundKey_invert---:\n");
-    // for(int r=0;r<Nr+1; r++)
-    // {
-    //   cout<<"round" << r <<" : ";
-    //   for (int d=0; d< Nk; d++)
-    //   {
-    //     cout<<d;
-    //     printf(". %05llx ",RoundKey_invert[r*Nk+d]);
-    //   }
-    //   cout<< "\n";
-    // }
-    // printf("\nRoundKey_invert---END!\n");
-
     auto context = Transcipher16_F_p::create_context(mValues[idx][1], mValues[idx][0], /*r=*/1, mValues[idx][2], 
-                                                      /*c=*/9, /*d=*/1, /*k=*/128, /*s=*/1);
+                                                      /*c=*/mValues[idx][3], /*d=*/1, /*k=*/128, /*s=*/1);
     Transcipher16_F_p FHE_cipher(context);
     FHE_cipher.print_parameters();
     // cipher.activate_bsgs(use_bsgs);
@@ -179,11 +148,12 @@ bool dec_test() {
     }
     // Output the encrypted text.
     printf("\nText after Yux decryption:\n");
-    for(i=0;i<Nk;i++)
-      {
-        cout<<i;
-        printf(". %05llx ",symDeced[i]);
-      }
+    for(i=0;i<Nk*nBlocks;i++)
+    {
+      if((i+1) %17 == 0) cout<<endl;
+      cout<<i;
+      printf(". %05llx ",symDeced[i]);
+    }
     printf("\n\n");
 
       

@@ -116,9 +116,9 @@ void Transcipher16_F_p::encryptSymKey(vector<Ctxt>& eKey, vector<uint64_t>& roun
 
     for (long i=0; i<eKey.size(); i++){ // encrypt the encoded key
       vector<long> slotsData(nslots, roundKeySchedule[i]);
-      cout<<(i+1)%16;
-      printf(". %05lx ",slotsData[0]);
-      if((i+1)%16 ==0) cout<<endl;
+      // cout<<(i+1)%16;
+      // printf(". %05lx ",slotsData[0]);
+      // if((i+1)%16 ==0) cout<<endl;
       ea.encrypt(eKey[i], *he_pk, slotsData);
     }
       // he_pk.Encrypt(eKey[i], encoded[i]);
